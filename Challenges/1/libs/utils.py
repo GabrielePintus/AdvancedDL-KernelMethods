@@ -1,12 +1,11 @@
 import torchvision.transforms as transforms
 import torchvision
+from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 from sklearn.model_selection import train_test_split
 import pandas as pd
 import torch
 from tqdm import tqdm
 import numpy as np
-from scipy.stats import hmean
-from sklearn.linear_model import LogisticRegression
 import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.graph_objects as go
@@ -147,6 +146,18 @@ def compute_preds(model, data_loader, device):
     preds = np.vstack(preds)
     return preds.argmax(axis=1)
 
+def compute_accuracy(model, data_loader, device):
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for X, y in data_loader:
+            X, y = X.to(device), y.to(device)
+            y_pred = model(X).argmax(1)
+            y_class = y.argmax(1)
+            correct += (y_pred == y_class).sum().item()
+            total += y.size(0)
+    return correct / total
+
 
 class Plots:
 
@@ -219,10 +230,3 @@ class Metrics:
     def harmonic_weighted_mean(x):
         harmonic_series = np.ones_like(x) / np.arange(1, len(x)+1)
         return np.sum(harmonic_series * x) / np.sum(harmonic_series)
-    
-    @staticmethod
-    def logreg_performance(X_train, y_train, X_val, y_val):
-        model = LogisticRegression(max_iter=1000)
-        model.fit(X_train, y_train)
-        acc_val = model.score(X_val, y_val)
-        return acc_val
