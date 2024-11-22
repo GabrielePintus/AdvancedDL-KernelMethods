@@ -95,7 +95,7 @@ $$
 where $(f^{\star}_1, f^{\star}_2, \dots, f^{\star}_M) \in \mathcal{H}_1 \times \mathcal{H}_2 \times \dots \times \mathcal{H}_M$
 is the solution of
 $$
-    \min_{f_1, f_2, \dots, f_M} \text{R}(\sum_{i=1}^{M} f_i^n) + \lambda \sum_{i=1}^{M} || f_i ||_{\mathcal{H}_i}^2
+    \min_{f_1, f_2, \dots, f_M} \text{R}(\sum_{i=1}^{M} f_i^n) + \lambda \sum_{i=1}^{M} || f_i ||_{\mathcal{H}_{K_i}}^2
 $$
 \end{theorem}
 Both the theorems are taken from the slides of the course
@@ -107,20 +107,43 @@ In practice, this means we can define a new kernel as the sum of others
 and obtain a linear separator in the space made by the concatenation of
 the feature maps of the original kernels. Moreover, each kernel contribute
 with its regularization term to the final solution. The sum can be generalized
-to a weighted sum and in this case the regularization term is weighted as well.
+to a weighted sum to obtain:
+\begin{align*}
+    K(x, y) = \sum_{i=1}^{M} \eta_i K_i(x, y) \\
+    \min_{f_1, f_2, \dots, f_M} \text{R}(\sum_{i=1}^{M} f_i^n) + \lambda \sum_{i=1}^{M} \frac{1}{\eta_i} || f_i ||_{\mathcal{H}_{K_i}}^2
+\end{align*}
+Notice that the regularization term is now \textit{weighted by the inverse} of the
+coefficients $\eta_i \ge 0$. This means that the solution is not invariant to a scaling
+of the coefficients vector $\eta$, and smaller values lead to a stronger regularization.
+
+In the Multiple Kernel Learning framework proposed by Lanckriet, et al. \cite{lanckriet2004learning},
+the coefficients $\eta$ are learned by solving the following optimization problem:
+
+
+
+
+
 We define our custom kernel as:
 \begin{align*}
     K_{\text{custom}}(x, y) &= K_{\text{gaussian}}(x, y) + K_{\text{cs}}(x, y) \\
     &= e^{\gamma_1 ||x-y||^2} + \tanh( \gamma_2 \left( 1 + \frac{\langle x, y \rangle}{||x|| ||y||} \right) )
 \end{align*}
 where $K_{\text{cs}}$ is the kernel of the cosine similarity rescaled
-in the interval $[0, 2]$ and the gamma parameters are $\gamma_1=0.5$ and
-$\gamma_2=1.386$.
+in the interval $[0, 2]$.
 
 Notice that we are combining a kernel invariant to rigid motions with 
 a kernel invariant to rotations (with respect to the origin) and scaling.
 The aim is to obtain a kernel which is invariant to all these transformations.
 
+The hyperparameters of the kernels are the following:
+\begin{itemize}
+    \item Gaussian: $\gamma = 0.1$
+    \item Poly2:    $\gamma = 0.1$
+    \item Sigmoid:  $\gamma = 0.1$, $\beta = 0$
+    \item CS:       $-$
+    \item Custom:   $\gamma_1 = 0.5$, $\gamma_2 = 1.6$
+\end{itemize}
+which have been chosen by manual tuning to maximize the explained variance.
 We then compute the explained variance ratio of the kernels and we
 plot it in the following figure.
 \begin{figure}[H]
