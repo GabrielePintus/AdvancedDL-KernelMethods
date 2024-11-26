@@ -50,15 +50,15 @@ where $\alpha_{i,k}$ are the coefficients of the $k$-th eigenvector.
 
 \subsection{Testing multiple kernels}
 Every kernel indirectly defines a Hilbert space of functions with some
-properties. The tested kernels are the following:
+properties. The gaussian kernel for example defines the space of functions
 \begin{align*}
     \mathcal{H}_{\text{gaussian}}   &= \left\{ f : \int | \hat{f}(w) |^2 e^{\frac{\sigma^2 w^2}{2}} dw < \infty \right\} \\
-    \mathcal{H}_{\text{poly2}}      &= \left\{  \right\} \\
-    \mathcal{H}_{\text{sigmoid}}    &= \left\{  \right\} \\
-    \mathcal{H}_{\text{cs}}         &= \left\{  \right\} \\
-    \mathcal{H}_{\text{laplace}}    &= \left\{ f : \int | \hat{f}(w) |^2 \frac{\gamma^2 + w^2}{\gamma} dw < \infty \right\} \\    
 \end{align*}
-In addition to this we enunciate the following theorem.
+In other words, the gaussian kernel defines a space of functions that are
+smooth and have a finite energy. 
+
+
+In addition to this we enunciate the following theorems.
 
 \begin{theorem}
 Forall $i = 1, 2, \dots, M$, let $\phi_i : \mathcal{X} \rightarrow \mathcal{H}_i$ be a feature map such that 
@@ -117,13 +117,9 @@ coefficients $\eta_i \ge 0$. This means that the solution is not invariant to a 
 of the coefficients vector $\eta$, and smaller values lead to a stronger regularization.
 
 In the Multiple Kernel Learning framework proposed by Lanckriet, et al. \cite{lanckriet2004learning},
-the coefficients $\eta$ are learned by solving the following optimization problem:
+the coefficients $\eta$ are learned by solving the convex optimization problem.
 
-
-
-
-
-We define our custom kernel as:
+Now, we define our custom kernel as:
 \begin{align*}
     K_{\text{custom}}(x, y) &= K_{\text{gaussian}}(x, y) + K_{\text{cs}}(x, y) \\
     &= e^{\gamma_1 ||x-y||^2} + \tanh( \gamma_2 \left( 1 + \frac{\langle x, y \rangle}{||x|| ||y||} \right) )
@@ -225,21 +221,30 @@ the Silhouette Score. The results are displayed in the following table.
         \hline
         Algorithm          & ARI   & NMI   & Silhouette \\
         \hline
-        KMeans             & 0.318 & 0.464 & \textbf{0.227} \\
-        Agglomerative      & 0.371 & \textbf{0.541} & 0.201 \\
-        Gaussian Mixture   & 0.329 & 0.501 & 0.170 \\
-        Spectral           & \textbf{0.374} & 0.505 & 0.202 \\
+        KMeans             & \textbf{0.368} & 0.505 & \textbf{0.227} \\
+        Agglomerative      & 0.361 & \textbf{0.541} & 0.201 \\
+        Gaussian Mixture   & 0.329 & 0.464 & 0.170 \\
+        Spectral           & 0.354 & 0.501 & 0.202 \\
         \hline
     \end{tabular}
 \end{table}
 
-From which we can see that the Gaussian Mixture Model is the best 
-performing algorithm.
+We decide to adopt the KMeans algorithm.
 To map the clusters to the labels we perform a manual inspection of the
 clusters and the labels by visualizing the ten points closest to the
 centroid of each cluster. We then assign the label to the cluster by
 majority voting. 
-Because it is not clear how to assign the couples (pullover, shirt) and (dress, coat)
+\begin{figure}[H]
+    \centering
+    \includegraphics[
+        width=0.4\textwidth,
+        % trim={100 10 100 90},
+        clip
+    ]{figures/clusters.png}
+\end{figure}
+
+
+Since it is not clear how to assign some couples (pullover, shirt) and (dress, coat)
 we test each of the four possible assignments and we choose the one with 
 the highest adjusted rand score.
 In the end we obtain the following mapping:
@@ -278,11 +283,11 @@ The optimizer is Adam with the following hyperparameters:
     \item $\beta_2$: 0.999
     \item $\varepsilon$: $10^{-8}$
 \end{itemize}
-The \enquote{Reduce lr on plateau} learning scheduler is used with a factor
+The \enquote{Reduce lr on plateau} learning rate scheduler is used with a factor
 of 0.5 and a patience of 5 epochs.
 The loss function is the cross entropy loss and the activation function
 is always the ReLU function, except for the output layer where the softmax
-function is used.
+function is used in order to obtain a vector of probabilities.
 
 The MLP has 4 hidden layers, each with 128 neurons.
 
@@ -306,7 +311,7 @@ The results are displayed in the following table.
     \centering
     \begin{tabular}{|c|c|c|}
         \hline
-        Model          & Training Accuracy & Validation Accuracy \\
+        Model          & Train Accuracy & Test Accuracy \\
         \hline
         SVM (Linear)   & 16.3 & \textbf{10.0} \\
         SVM (Poly)     & 18.8 & 7.3 \\
@@ -319,7 +324,10 @@ The results are displayed in the following table.
 \end{table}
 Where the training accuracy is computed on the labels obtained from the
 clustering and the validation accuracy is computed on the original labels of 
-the validation set.
+the validation set. We can see that the performance of the classifiers is
+definitely unsatisfactory. This is due to the fact that the labels obtained
+from the clustering are not perfect and the classifiers are not able to
+generalize well on them.
 
 
 \section{Fully Supervised Learning}
@@ -336,7 +344,7 @@ The results are displayed in the following table.
     \centering
     \begin{tabular}{|c|c|c|}
         \hline
-        Model          & Training Accuracy & Validation Accuracy \\
+        Model          & Train Accuracy & Test Accuracy \\
         \hline
         SVM (Linear)   & 78.0 & 76.4 \\
         SVM (Poly)     & 80.1 & 77.1 \\
@@ -348,8 +356,9 @@ The results are displayed in the following table.
     \end{tabular}
 \end{table}
 
-As we can see, the performance of the classifiers definitely improved
-when trained on the original labels.
+This time the performance of the classifiers is clearly better. This is
+due to the fact that the labels are now correct and the classifiers can
+better learn the true manifold of the data.
 
 \subsection{Original dataset}
 We repeat the same experiment on the original dataset and obtain the
@@ -370,10 +379,32 @@ following results.
     \end{tabular}
 \end{table}
 We can see that the performance of the classifiers improves even more
-when trained on the original dataset. We should also note that no 
+when trained on the original dataset. We should also mention that no 
 tuning of the hyperparameters was performed in this section and we 
 just used the same hyperparameters as in the previous section.
 By tuning them for this dataset we could obtain even better results.
+
+We now briefly collect the best results of the experiments in the following table.
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|}
+        \hline
+        Model          & Train Accuracy & Test Accuracy & Dataset \\
+        \hline
+        SVM (Linear)   & 16.3 & 10.0 & Clustering \\
+        SVM (Sigmoid)  & 10.4 & 8.6 & Clustering \\
+        CNN            & 16.3 & 10.0 & Clustering \\
+        \hline
+        SVM (Gaussian) & 83.6 & 81.1 & KPCA \\
+        MLP            & 87.1 & 82.5 & KPCA \\
+        CNN            & 85.4 & 79.1 & KPCA \\
+        \hline
+        SVM (Gaussian) & 90.8 & 84.6 & Original \\
+        MLP            & 93.9 & 85.0 & Original \\
+        CNN            & \textbf{96.9} & \textbf{86.4} & Original \\
+        \hline
+    \end{tabular}
+\end{table}
 
 
 \section{Conclusions}
@@ -384,3 +415,7 @@ We have also seen how unsupervised learning can be used to retrieve
 labels from the data and how these labels can be used to train classifiers.
 Finally, we have seen how the performance of the classifiers can improve
 when trained on the original labels.
+We performed the fully supervised learning experiment twice, once with
+the KPCA reduced dataset, with only 10 features, and once with the original dataset, with all the 728 features. We obtained
+the best results with the original dataset, where the CNN reached an
+accuracy of 86.4\% on the test set.
