@@ -94,6 +94,5 @@ def interpolate_test_losses(losses_test, n_steps, test_every):
     interpolated_test_losses = np.full(n_steps, np.nan)
     interpolated_test_losses[::test_every] = losses_test
     interpolated_test_losses = pd.Series(interpolated_test_losses).interpolate()
-    return interpolate_test_losses
-    
+    return interpolated_test_losses
     
