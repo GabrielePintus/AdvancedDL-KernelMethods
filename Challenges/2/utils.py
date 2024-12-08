@@ -82,13 +82,68 @@ def train(
             losses_test.append(loss)
             
             # Update progress bar logging train and test loss
-            # progress_bar.set_description(f"Train Loss: {losses_train[-1]:.1e}, Test Loss: {losses_test[-1]:.1e}")
-            progress_bar.set_postfix({'Train Loss': losses_train[-1], 'Test Loss': losses_test[-1]})
-                
+            progress_bar.set_postfix({'Train Loss': np.mean(losses_train[-3:]), 'Test Loss': np.mean(losses_test[-3:])})                
             progress_bar.update(test_every)
                 
     return losses_train, losses_test
+
+
+def train_resnet(
+    model,
+    train_loader,
+    test_loader,
+    optimizer,
+    criterion,
+    n_epochs=10,
+    test_every=1,
+    device = torch.device('cpu')
+):
+    losses_train, losses_test = [], []    
+    progress_bar = tqdm(range(n_epochs), desc='Training', leave=True, position=0)
+    
+    for epoch in progress_bar:
+        model.train()
+        tmp_loss = 0
         
+        for X, y in train_loader:
+            X, y = X.to(device), y.to(device)
+            
+            # Zero gradients
+            optimizer.zero_grad()
+            
+            # Forward pass
+            y_pred = model(X)
+            
+            # Compute loss
+            loss = criterion(y_pred, y)
+            
+            # Backward pass
+            loss.backward()
+            
+            # Gradient clipping
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
+            
+            # Optimize
+            optimizer.step()
+            
+            # Compute train loss
+            tmp_loss += loss.item()
+        losses_train.append(tmp_loss / len(train_loader))
+            
+        # Compute test loss
+        for X, y in test_loader:
+            X, y = X.to(device), y.to(device)
+            y_pred = model(X)
+            loss = criterion(y_pred, y)
+            tmp_loss += loss.item()
+        losses_test.append(tmp_loss / len(test_loader))
+            
+        # Update progress bar logging train and test loss
+        progress_bar.set_postfix({'Train Loss': np.mean(losses_train[-3:]), 'Test Loss': np.mean(losses_test[-3:])})                
+            
+    return losses_train, losses_test
+
+
         
 def interpolate_test_losses(losses_test, n_steps, test_every):
     interpolated_test_losses = np.full(n_steps, np.nan)
@@ -96,3 +151,43 @@ def interpolate_test_losses(losses_test, n_steps, test_every):
     interpolated_test_losses = pd.Series(interpolated_test_losses).interpolate()
     return interpolated_test_losses
     
+
+# Second exercise
+from sympy import symbols, lambdify
+import random
+
+# Define symbolic variables
+x1, x2, x3, x4, x5, x6 = symbols("x1 x2 x3 x4 x5 x6")
+
+# Define the hierarchical Bell polynomial B6
+B6 = (
+    x1**6
+    + 15 * x2 * x1**4
+    + 20 * x3 * x1**3
+    + 45 * x2**2 * x1**2
+    + 15 * x2**3
+    + 60 * x3 * x2 * x1
+    + 15 * x4 * x1**2
+    + 10 * x3**2
+    + 15 * x4 * x2
+    + 6 * x5 * x1
+    + x6
+)
+B6_scrambled = (
+    x6
+    + 6 * x5 * x1
+    + 15 * x4 * x2
+    + 10 * x3**2
+    + 15 * x4 * x1**2
+    + 60 * x3 * x2 * x1
+    + 15 * x2**3
+    + 45 * x2**2 * x1**2
+    + 20 * x3 * x1**3
+    + 15 * x2 * x1**4
+    + x1**6
+)
+
+# Create a callable function for numerical evaluation
+bell6 = lambdify([x1, x2, x3, x4, x5, x6], B6, "numpy")
+bell6_scrambled = lambdify([x1, x2, x3, x4, x5, x6], B6_scrambled, "numpy")
+
