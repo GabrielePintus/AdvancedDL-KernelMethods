@@ -19,7 +19,7 @@ The outline of this section is taken from the course "Machine Learning
 with Kernel Methods" of J. Mairal and J.P. Vert. [slides](References/Machine%20Learning%20with%20Kernel%20Methods.pdf).
 
 ### Kernel functions and RKHS
-- Positive definite kernel [Wikipedia](https://en.wikipedia.org/wiki/Positive-definite_kernel)
+- Positive definite kernel [Wikipedia](https://en.wikipedia.org/wiki/Positive-definite_kernel), [Slides](References/Machine%20Learning%20with%20Kernel%20Methods.pdf#page=18)
 - Reproducing kernel Hilbert space (RKHS) [Wikipedia](https://en.wikipedia.org/wiki/Reproducing_kernel_Hilbert_space)
 - Popular kernels
 - Smoothness functional
