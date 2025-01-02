@@ -14,6 +14,7 @@ This document contains the list of topics that, in my opinion, are important for
 - Pooling [Wikipedia](https://en.wikipedia.org/wiki/Convolutional_neural_network#Pooling_layer), [Review paper](References/Pooling%20Methods%20in%20Deep%20Neural%20Networks,%20a%20Review.pdf)
 - Fourier transform [Wikipedia](https://en.wikipedia.org/wiki/Fourier_transform)
 - Wavelet transform [Wikipedia](https://en.wikipedia.org/wiki/Wavelet_transform)
+- Curse of dimensionality [Wikipedia](https://en.wikipedia.org/wiki/Curse_of_dimensionality)
 
 ## Preliminaries
 
@@ -100,4 +101,36 @@ with Kernel Methods" of J. Mairal and J.P. Vert. [slides](References/Machine%20L
 - Data augmentation and symmetries [Paper](References/Data%20Symmetries%20and%20Learning%20in%20Fully%20Connected%20Neural%20Networks.pdf)
 - Generalization of Equivariance and Convolution in Neural Networks
 to the Action of Compact Groups. [Paper](References/On%20the%20Generalization%20of%20Equivariance%20and%20Convolution%20in%20Neural%20Networks%20to%20the%20Action%20of%20Compact%20Groups.pdf)
+- Permuation equivariant layer. [Paper](References/Deep%20Sets.pdf)
+- Data Augmentation. [Wikipedia](https://en.wikipedia.org/wiki/Data_augmentation).
+- Compositionality prior and weight sharing
+- Fourier important features
+- Softmax function. [Wikipedia](https://en.wikipedia.org/wiki/Softmax_function)
+- Exponential tilting. [Wikipedia](https://en.wikipedia.org/wiki/Exponential_tilting)
+
+### Other topics
+
+- Generative adversarial networks. 
+- Networks:
+    - Perceptrons: function regularity
+    - CNNs: Translation invariance
+    - Group CNNs: Translation+Rotation invariance, global groups
+    - LSTMs: Time warping invariance
+    - DeepSets/Transformer: Permutation invariance
+    - Graph CNNs: Permutation invariance
+
+
+## Biologically inspired learning
+
+- Interplay between neuroscience and machine learning. [Paper](References/Natural%20and%20Artificial%20Intelligence%20-%20A%20brief%20introduction%20to%20the%20interplay%20between%20AI%20and%20neuroscience%20research.pdf)
+- Invariance and selectivity
+
+
+## Geometric Deep Learning
+
+One important direction is the understanding of the geometry of the data and the design of meaningful priors to decrease the sample complexity of the learning.
+
+
+## Advarsarial Attacks
+
 
