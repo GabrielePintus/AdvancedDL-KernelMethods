@@ -88,7 +88,7 @@ with Kernel Methods" of J. Mairal and J.P. Vert. [slides](References/Machine%20L
 - Gradient descent. [Wikipedia](https://en.wikipedia.org/wiki/Gradient_descent), [Paper](References/Implicit%20Gradient%20Regularization.pdf)
 - Stochastic gradient descent. [Wikipedia](https://en.wikipedia.org/wiki/Stochastic_gradient_descent), [Paper](References/On%20the%20Origin%20of%20Implicit%20Regularization%20in%20Stochastic%20Gradient%20Descent.pdf)
 - Noisy inputs. [Paper](References/Training%20with%20Noise%20is%20Equivalent%20to%20Tikhonov%20Regularization.pdf)
-- Dropout. [Paper](References/Improving%20neural%20networks%20by%20preventing%20co-adaptation%20of%20feature%20detectors.pdf)
+- Dropout. [Paper](References/Improving%20neural%20networks%20by%20preventing%20co-adaptation%20of%20feature%20detectors.pdf), [Paper](References/Dropout%20Training%20as%20Adaptive%20Regularization.pdf)
 - Matrix completion via convex optimization. [Paper](References/Exact%20Matrix%20Completion%20via%20Convex%20Optimization.pdf)
 - Weights initialization. [Paper](References/On%20weight%20initialization%20in%20deep%20neural%20networks.pdf)
 - Xavier initialization. [Paper](References/Understanding%20the%20difficulty%20of%20training%20deep%20feedforward%20neural%20networks.pdf)
