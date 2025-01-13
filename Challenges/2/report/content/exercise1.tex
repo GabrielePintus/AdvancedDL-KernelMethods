@@ -1,0 +1,65 @@
+\section{Exercise1}
+
+This exercise investigates how the parameterization of a student neural
+network relative to a teacher network affects its ability to learn.
+
+\subsection{Setup}
+
+We instantiate the teacher model $T$ as a fully connected neural network,
+mapping a 100-dimensional input to a single output scalar, with three hidden
+layers of 75, 50, 10 neurons respectively. 
+We then instantiate three student models $S_1, S_2, S_3$ as fully connected neural
+networks with the following architectures:
+\begin{align*}
+    S_1 &\text{ : 100-10-1}
+    \\
+    S_2 &\text{ : 100-75-50-10-1}
+    \\
+    S_3 &\text{ : 100-200-200-200-100-1}
+\end{align*}
+After doing so with proceed by generating
+the testing data by sampling from the teacher model.
+\begin{align*}
+    D_{test} &= \{(x_i, T(x_i))\}_{i=1}^{N}
+    \\
+    x_i &\sim \mathcal{U}(0, 2)^{100}
+    \\
+    N &= 6 \cdot 10^4
+\end{align*}
+Conversely, the training data is generated lazily by sampling from the teacher
+during training. 
+
+
+\subsection{Training}
+We train each model with the Adam optimizer for 1000 steps with a batch size of
+128. We use the mean squared error loss function and the learning rate is tuned
+by empirical validation as suggested in class. The learning rate for each model is as follows:
+\begin{align*}
+    S_1 &\text{ : 2e-1}
+    \\
+    S_2 &\text{ : 3.5e-2}
+    \\
+    S_3 &\text{ : 9e-3}
+\end{align*}
+
+The loss evolution plots are reported below.
+\input{content/plots/loss_under.tex}
+\input{content/plots/loss_equal.tex}
+\input{content/plots/loss_over.tex} 
+
+The x-axis has been truncated to 500 steps because the loss evolution of the
+student models is not evolving much after that point. Hereafter we report the final
+loss achieved by each model.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|}
+        \hline
+        Model & Train Loss & Test Loss \\
+        \hline
+        $S_1$ & 47755 & 44895 \\
+        $S_2$ & \textbf{42176} & 54148 \\
+        $S_3$ & 47430 & \textbf{42891} \\
+        \hline
+    \end{tabular}
+\end{table}
