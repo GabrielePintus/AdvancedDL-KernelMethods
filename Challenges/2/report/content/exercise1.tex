@@ -48,18 +48,115 @@ The loss evolution plots are reported below.
 \input{content/plots/loss_over.tex} 
 
 The x-axis has been truncated to 500 steps because the loss evolution of the
-student models is not evolving much after that point. Hereafter we report the final
+student models was not evolving much after that point. Hereafter we report the final
 loss achieved by each model.
 
 \begin{table}[H]
     \centering
-    \begin{tabular}{|c|c|c|}
-        \hline
-        Model & Train Loss & Test Loss \\
-        \hline
+    \begin{tabular}{c|cc}
+        \toprule
+        \textbf{Model} & Train Loss & Test Loss \\
+        \midrule
         $S_1$ & 47755 & 44895 \\
         $S_2$ & \textbf{42176} & 54148 \\
         $S_3$ & 47430 & \textbf{42891} \\
-        \hline
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+The best on-sample performance is achieved by the $S_2$ model,
+which shares the same architecture as the teacher model. However,
+when evaluating out-of-sample performance, the $S_3$ model, the over-parameterized 
+one, exhibits the lowest estimated generalization error. Interestingly,
+the worst-performing model among the three is $S_2$, the equally parameterized version,
+while even the under-parameterized model, $S_1$, outperforms it. \\
+
+This behavior can be explained by the double descent phenomenon,
+where model performance initially improves as complexity increases,
+deteriorates at the interpolation threshold, and then improves again
+with further complexity. The three models, in this case, perfectly 
+reproduce the three regime described in literature
+\cite{belkin2019biasvariance} \cite{nakkiran2019deepdoubledescent} \cite{lafon2024doubledescent}
+, which we briefly summarize below.
+\begin{itemize}
+    \item \textbf{Under-parameterized regime}: the model is too simple to capture the complexity of the data.
+    \item \textbf{Interpolation threshold}: the model is complex enough to interpolate the data, but not to generalize.
+    \item \textbf{Over-parameterized regime}: the model is complex enough to generalize.
+\end{itemize}
+
+
+\subsection{Weights distribution}
+
+We now analyze the distribution of the weights of the student models,
+both network-wide and layer-wise.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{figures/weights_distribution.png}
+    \caption{Weights distribution for the student models.}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \begin{tabular}{c|cc}
+    \toprule
+    \textbf{Model}                      & Mean & Std \\
+    \midrule
+    $S_1$                                 & -0.98         & 2.39         \\
+    $S_2$                                 & -0.10         & 0.42         \\
+    $S_3$                                 & -0.01         & 0.11         \\
+    $T$                                   &  0.00         & 0.99         \\
+    \bottomrule
+    \end{tabular}
+    \caption{Summary statistics for students and teacher models.}
+\end{figure}
+
+As we can see, the model closest in mean to the teacher is the over-parameterized
+one, which is also the one with the lowest variance. The under-parameterized model, 
+instead, has the highest variance and the lowest mean. \\
+Means and standard deviations for each layer are reported in
+the table below.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{c|cc|cc|cc|cc}
+    \toprule
+    \textbf{Layer} & $\mathbf{\mu_1}$ & $\mathbf{\sigma_1}$ & $\mathbf{\mu_2}$ & $\mathbf{\sigma_2}$ & $\mathbf{\mu_3}$ & $\mathbf{\sigma_3}$ & $\mathbf{\mu_T}$ & $\mathbf{\sigma_T}$ \\
+    \midrule
+    $w_1$ & -0.98 & 2.39 & -0.13 & 0.50 & -0.03 & 0.14 & 0.00 & 0.99 \\
+    $b_1$ & -0.51 & 2.11 & -0.04 & 0.31 & -0.01 & 0.05 & -0.12 & 0.82 \\
+    $w_2$ & -1.32 & 2.34 & -0.06 & 0.27 & -0.01 & 0.10 & 0.01 & 0.99 \\
+    $b_2$ & -7.27 & 0.00 & 0.02 & 0.40 & 0.02 & 0.11 & 0.00 & 0.93 \\
+    $w_3$ & - & - & -0.06 & 0.25 & -0.01 & 0.09 & -0.02 & 1.02 \\
+    $b_3$ & - & - & 0.14 & 0.46 & 0.04 & 0.11 & -0.11 & 0.99 \\
+    $w_4$ & - & - & -0.02 & 0.34 & -0.01 & 0.10 & -0.12 & 0.91 \\
+    $b_4$ & - & - & -0.61 & 0.00 & 0.00 & 0.14 & 0.78 & 0.00 \\
+    $w_5$ & - & - & - & - & 0.00 & 0.14 & - & - \\
+    $b_5$ & - & - & - & - & -0.11 & 0.14 & - & - \\
+    \bottomrule
+    \end{tabular}
+\end{table}
+
+As we can see, the over-parameterized model has the weights more similarly distributed
+across layers, with the under-parameterized model having the most different distributions.
+Moreover if we compute the network-wide norm and the layer-wise norms we can see that the
+over-parameterized model has the lowest norm on average.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{c|ccc|c}
+    \toprule
+    \textbf{Layer} & $S_1$ & $S_2$ & $S_3$ & $T$ \\
+    \midrule
+    $w_1$ & 81.67 & 44.82 & 20.22 & 85.37 \\
+    $b_1$ & 6.88  & 2.71  & 0.79  & 7.14  \\
+    $w_2$ & 8.49  & 16.89 & 20.37 & 60.67 \\
+    $b_2$ & 7.27  & 2.84  & 1.56  & 6.55  \\
+    $w_3$ & -     & 9.10  & 18.66 & 36.10 \\
+    $b_3$ & -     & 2.39  & 1.63  & 5.00  \\
+    $w_4$ & -     & 1.68  & 14.56 & 4.61  \\
+    $b_4$ & -     & 0.61  & 0.93  & 0.78  \\
+    $w_5$ & -     & -     & 1.39  & -     \\
+    $b_5$ & -     & -     & 0.11  & -     \\
+    \bottomrule
     \end{tabular}
 \end{table}
